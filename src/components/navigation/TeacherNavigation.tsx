@@ -1,4 +1,4 @@
-import { createStyles, makeStyles, Theme, Tooltip } from "@material-ui/core";
+import { Badge, createStyles, makeStyles, Theme, Tooltip } from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -61,9 +61,16 @@ function TeacherNavigation(props: TeacherNavigationProps & EContextValue) {
               onClick={() => setValue(1)}
               className={value === 1 ? classes.selectedItem : undefined}
             >
-              <ListItemIcon>
-                <Icon path={mdiFaceAgent} size={1} />
-              </ListItemIcon>
+              <Badge 
+              anchorOrigin = {{horizontal: 'left', vertical: 'top'}} 
+              badgeContent = {2} 
+              color = "primary" 
+              max = {50}
+              overlap = 'rectangular'>
+                <ListItemIcon>
+                  <Icon path={mdiFaceAgent} size={1} />
+                </ListItemIcon>
+              </Badge>
               <ListItemText primary="List Help Requests" />
             </ListItem>
           </Tooltip> : <></>}
