@@ -9,7 +9,7 @@ import GradeIcon from "@material-ui/icons/Grade";
 import PowerSettingsNewIcon from "@material-ui/icons/PowerSettingsNew";
 import { mdiFaceAgent } from "@mdi/js";
 import Icon from '@mdi/react';
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import DashboardTA from "../dashboard/DashboardTA";
 import DemonstrateTeacher from "../demonstrateGoal/DemonstrateTeacher";
@@ -18,6 +18,9 @@ import FirstTimeSetupTeacher from "../firstTimeSetup/FirstTimeSetupTeacher";
 import HelpTeacher from "../help/HelpTeacher";
 import { withUser } from "../userContext";
 import { EContextValue } from "../userContext/UserContext";
+import { QualityOfServiceResponse } from "../../models/QualityOfServiceResponse";
+import { AxiosResponse } from "axios";
+import axios from "../../utils/axios";
 type TeacherNavigationProps = EContextValue;
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -28,14 +31,34 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+
 function TeacherNavigation(props: TeacherNavigationProps & EContextValue) {
   const { t } = useTranslation();
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
+  const [qosData, setQosdata] = React.useState<QualityOfServiceResponse | undefined>(undefined);
+  const loading = !qosData;
+
+  //--------Gets QoS data to show queue
+  const getQoS = async () =>{
+    await axios.get('qos')
+    .then(response => 
+      {setQosdata(response.data)})
+    .catch(error => {console.log(error)})
+  }
+
+  useEffect(() => {
+    getQoS()
+  }, [])
+
+//Update occasionally as in QoSCard
+  setInterval(() => getQoS(), 6000)
+//---------End of new code
 
   const logout = () => {
     props.clearStorage();
   };
+  
 
   const menuItems = (
     <>
@@ -61,9 +84,10 @@ function TeacherNavigation(props: TeacherNavigationProps & EContextValue) {
               onClick={() => setValue(1)}
               className={value === 1 ? classes.selectedItem : undefined}
             >
+              {/* New Badge showing queue */}
               <Badge 
               anchorOrigin = {{horizontal: 'left', vertical: 'top'}} 
-              badgeContent = {2} 
+              badgeContent = {loading ? 0 : qosData?.helpRequestsPending + qosData?.demonstrationsPending}
               color = "primary" 
               max = {50}
               overlap = 'rectangular'>
